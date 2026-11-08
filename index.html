@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gestión de Entregas</title>
+<style>
+:root {
+  --bg: #0d0f12;
+  --card: #15181e;
+  --card-inner: #1a1e26;
+  --tx: #f0f4f8;
+  --mu: #8b98a5;
+  --bd: #262b35;
+  --ac: #3b82f6;
+  --ok: #00ff88;
+  --ok-btn: #00e676;
+  --wa: #25d366;
+  --wr: #ff9800;
+  --danger: #ef4444;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--tx);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 16px;
+}
+
+main {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 12px 0 20px 0;
+  color: var(--ok);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.status-bar {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.status-badge {
+  background: var(--ok);
+  color: #000;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.search-box {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--bd);
+  color: var(--tx);
+  border-radius: 10px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  outline: none;
+}
+.search-box:focus {
+  border-color: var(--ok);
+}
+
+.section-box {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  color: var(--ok);
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+/* Estilos para los reportes y filtros de fechas */
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.report-card {
+  background: var(--card-inner);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+.report-card .num {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ok);
+}
+.report-card .label {
+  font-size: 11px;
+  color: var(--mu);
+  margin-top: 2px;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.filter-row input[type="date"], .filter-row select {
+  flex: 1;
+  padding: 8px;
+  background: var(--card-inner);
+  border: 1px solid var(--bd);
+  color: var(--tx);
+  border-radius: 8px;
+  font-size: 12px;
+  outline: none;
+}
+.filter-btns {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.f-btn {
+  background: var(--card-inner);
+  border: 1px solid var(--bd);
+  color: var(--mu);
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.f-btn.active {
+  background: var(--ok);
+  color: #000;
+  font-weight: 600;
+  border-color: var(--ok);
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background: var(--card-inner);
+  border: 1px solid var(--bd);
+  color: var(--tx);
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 14px;
+  outline: none;
+}
+input[type="text"]:focus {
+  border-color: var(--ok);
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 16px 0;
+  font-size: 13px;
+  color: var(--mu);
+  cursor: pointer;
+}
+
+.btn-submit {
+  width: 100%;
+  background: var(--ok-btn);
+  color: #000;
+  font-weight: 700;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-submit:hover {
+  opacity: 0.9;
+}
+
+.card {
+  background: var(--card-inner);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.card.done {
+  opacity: 0.45;
+}
+
+.nm {
+  font-weight: 700;
+  font-size: 17px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+}
+.ad {
+  color: var(--mu);
+  font-size: 14px;
+  margin-top: 4px;
+}
+.meta {
+  color: var(--mu);
+  font-size: 13px;
+  margin-top: 4px;
+}
+.at {
+  margin: 10px 0;
+  font-size: 14px;
+}
+.at b {
+  color: var(--wr);
+}
+
+.main-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.b-main {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--ac);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.b-main.wa {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  color: var(--tx);
+}
+
+.sm-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.sm-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--bd);
+  background: var(--card);
+  color: var(--tx);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.sm-btn.ok {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+.sm-btn.no {
+  color: var(--wr);
+  border-color: var(--wr);
+}
+.sm-btn.del {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  border: 1px solid var(--bd);
+}
+.tag.ok {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+.tag.no {
+  color: var(--wr);
+  border-color: var(--wr);
+}
+dialog{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:14px;padding:18px;width:min(92vw,460px)}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+.status-badge.off{background:var(--wr)}
+</style>
+</head>
+<body>
+<main>
+
+<h1>📦 Gestión de Entregas</h1>
+
+<div class="status-bar">
+  <span>Estado:</span>
+  <span class="status-badge" id="sync-status">Sistema Activo</span>
+  <button class="f-btn" onclick="cargarDatos()">🔄 Actualizar</button>
+  <button class="f-btn" onclick="configurar(true)">⚙️</button>
+</div>
+
+<input type="text" class="search-box" id="search" placeholder="🔍 Buscar por nombre, teléfono, dirección o guía..." oninput="render()">
+
+<div class="section-box">
+  <div class="section-title">📊 Reportes y Filtros</div>
+  <div class="reports-grid">
+    <div class="report-card">
+      <div class="num" id="rep-total">0</div>
+      <div class="label">Total</div>
+    </div>
+    <div class="report-card">
+      <div class="num" id="rep-pend">0</div>
+      <div class="label">Pendientes</div>
+    </div>
+    <div class="report-card">
+      <div class="num" id="rep-ent">0</div>
+      <div class="label">Entregados</div>
+    </div>
+  </div>
+
+  <div class="filter-btns">
+    <button class="f-btn active" onclick="setFiltroFecha('todos', this)">Todos</button>
+    <button class="f-btn" onclick="setFiltroFecha('hoy', this)">Hoy</button>
+    <button class="f-btn" onclick="setFiltroFecha('semana', this)">Esta Semana</button>
+    <button class="f-btn" onclick="setFiltroFecha('mes', this)">Este Mes</button>
+  </div>
+
+  <div class="filter-row">
+    <span style="font-size:12px; color:var(--mu); align-self:center;">Desde:</span>
+    <input type="date" id="date-from" onchange="render()">
+    <span style="font-size:12px; color:var(--mu); align-self:center;">Hasta:</span>
+    <input type="date" id="date-to" onchange="render()">
+  </div>
+</div>
+
+<div class="section-box">
+  <div class="section-title">Registrar Paquete</div>
+  <input type="file" id="ocr-file" accept="image/*" capture="environment" style="display:none" onchange="escanear(this.files[0]); this.value=''">
+  <button class="btn-submit" style="margin-bottom:8px" onclick="document.getElementById('ocr-file').click()">📷 Escanear etiqueta (IA)</button>
+  <div id="ocr-st" class="meta" style="margin-bottom:12px"></div>
+  <input type="text" id="add-name" placeholder="Nombre del Cliente">
+  <input type="text" id="add-tel" placeholder="Teléfono Principal">
+  <input type="text" id="add-dir" placeholder="Dirección">
+  <input type="text" id="add-gui" placeholder="Código de Guía">
+  <label class="checkbox-container">
+    <input type="checkbox" id="add-blur"> Marcar si la etiqueta es poco nítida / borrosa
+  </label>
+  <button class="btn-submit" onclick="guardarPaquete()">Guardar y Enviar a Sheets</button>
+</div>
+
+<div class="section-box">
+  <div class="section-title">Listado de Paquetes</div>
+  <div id="list">
+    <div style="text-align:center; color:var(--mu); padding:10px;">Cargando paquetes...</div>
+  </div>
+</div>
+
+</main>
+
+<dialog id="dlg-cfg">
+  <div class="section-title" style="margin-bottom:8px">Conectar con tu hoja</div>
+  <div class="meta" style="margin:0 0 10px 0">Puedes salir a copiar los datos y volver: esta ventana no se cierra.</div>
+  <input type="text" id="c-sheet" placeholder="Enlace o ID de tu hoja de Google">
+  <input type="text" id="c-api" placeholder="URL de tu Apps Script (termina en /exec)">
+  <input type="password" id="c-gem" placeholder="Clave de Gemini (para escanear con IA)">
+  <input type="text" id="c-model" placeholder="Modelo de Gemini (vacío = gemini-2.5-flash)">
+  <div class="main-actions"><button type="button" class="b-main" onclick="guardarCfg()">Guardar</button><button type="button" class="b-main wa" onclick="document.getElementById('dlg-cfg').close()">Cancelar</button></div>
+  <div class="sm-row"><button type="button" class="sm-btn" onclick="enlaceCfg()">🔗 Copiar enlace para configurar otro dispositivo</button></div>
+</dialog>
+<dialog id="dlg">
+  <div class="section-title" id="dlg-t" style="margin-bottom:8px">Editar paquete</div>
+  <div class="meta" id="dlg-warn" style="color:var(--wr);margin:0 0 10px 0"></div>
+  <input type="text" id="f-n" placeholder="Nombre del cliente">
+  <input type="text" id="f-t" inputmode="tel" placeholder="Teléfono">
+  <input type="text" id="f-x" inputmode="tel" placeholder="Teléfono alterno (opcional)">
+  <input type="text" id="f-a" placeholder="Dirección">
+  <input type="text" id="f-g" placeholder="Código de guía">
+  <input type="text" id="f-w" placeholder="Advertencia (vacía para quitarla)">
+  <div class="main-actions"><button type="button" class="b-main" onclick="guardarForm()">Guardar</button><button type="button" class="b-main wa" onclick="document.getElementById('dlg').close()">Cancelar</button></div>
+</dialog>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<script>
+(() => {
+  const m = /[#&]c=([^&]+)/.exec(location.hash);
+  if (!m) return;
+  try {
+    const d = JSON.parse(atob(decodeURIComponent(m[1])));
+    if (d.sheet && d.api) localStorage.setItem("cfg_entregas", JSON.stringify(d));
+  } catch (e) {}
+  history.replaceState(null, "", location.pathname + location.search);
+})();
+const CFG = (() => { try { return JSON.parse(localStorage.getItem("cfg_entregas") || "{}"); } catch (e) { return {}; } })();
+const SPREADSHEET_ID = CFG.sheet || "";
+const API_URL = CFG.api || "";
+const E = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function isoLocal(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function hoyLocal(){return isoLocal(new Date());}
+function fechaSheet(v){
+  if(!v) return hoyLocal();
+  const m=/^Date\((\d+),(\d+),(\d+)/.exec(v);
+  if(m) return m[1]+"-"+String(+m[2]+1).padStart(2,"0")+"-"+String(+m[3]).padStart(2,"0");
+  return String(v).split("T")[0];
+}
+function paquete(p,action){return {action,id:p.id,date:p.fecha,n:p.n,t:p.t,a:p.a,g:p.g,x:p.x||"",att:p.att,st:p.st,w:p.w};}
+const COLA_KEY = "cola_entregas", CACHE_KEY = "cache_entregas";
+let falloRed = false, enviando = false;
+function leerCola() { try { return JSON.parse(localStorage.getItem(COLA_KEY) || "[]"); } catch (e) { return []; } }
+function guardarCola(c) { try { localStorage.setItem(COLA_KEY, JSON.stringify(c)); } catch (e) {} }
+function estado(texto, ok) {
+  const st = document.getElementById("sync-status");
+  st.textContent = texto;
+  st.classList.toggle("off", !ok);
+}
+function refrescarEstado() {
+  const n = leerCola().length;
+  if (!navigator.onLine || falloRed) return estado("Sin conexión" + (n ? " · " + n + " cambio(s) por enviar" : ""), false);
+  if (n) return estado("Enviando " + n + " cambio(s)…", true);
+  estado("Sistema Activo", true);
+}
+function usarCache() {
+  if (L.length) return;
+  try { L = JSON.parse(localStorage.getItem(CACHE_KEY) || "[]"); } catch (e) { L = []; }
+  render();
+}
+async function vaciarCola() {
+  if (enviando || !API_URL) return;
+  enviando = true;
+  try {
+    let c = leerCola();
+    while (c.length && navigator.onLine) {
+      await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(c[0]) });
+      c = leerCola(); c.shift(); guardarCola(c);
+      falloRed = false;
+      refrescarEstado();
+    }
+  } catch (e) { falloRed = true; }
+  enviando = false;
+  refrescarEstado();
+}
+function enviar(payload) {
+  if (!API_URL) return estado("Falta la URL de Apps Script", false);
+  const c = leerCola(); c.push(payload); guardarCola(c);
+  refrescarEstado();
+  vaciarCola();
+}
+window.addEventListener("online", () => { falloRed = false; refrescarEstado(); vaciarCola(); });
+window.addEventListener("offline", refrescarEstado);
+
+const normG = g => String(g || "").replace(/\s/g, "").toUpperCase();
+function duplicada(g, exceptId) {
+  const k = normG(g);
+  return k ? L.find(p => normG(p.g) === k && p.id != exceptId) : null;
+}
+function avisoDup(p) { return "La guía " + p.g + " ya está registrada (" + p.n + ", " + p.fecha + ")."; }
+let L = [];
+let filtroActual = 'todos';
+
+const ph = s => { s = String(s||"").replace(/\D/g,""); return s.length === 9 ? "51" + s : s; };
+function saludo() { const h = new Date().getHours(); return h < 12 ? "buenos días" : h < 19 ? "buenas tardes" : "buenas noches"; }
+function msg(p) { return `Hola, ${saludo()}, somos de Temu, me estuve intentando comunicar con usted por la entrega de su paquete.`; }
+function wa(p, num) { return "https://wa.me/" + ph(num) + "?text=" + encodeURIComponent(msg(p)); }
+
+window.procesarDatosSheets = function(response) {
+  if (!response || !response.table) {
+    document.getElementById("sync-status").textContent = "Error de lectura";
+    return;
+  }
+  L = response.table.rows.map((row, idx) => {
+    const c = row.c;
+    return {
+      id: c[0]?.v || idx + 1,
+      fecha: fechaSheet(c[1]?.v),
+      n: String(c[2]?.v || "Sin nombre"),
+      t: c[3]?.v ? String(c[3].v) : "",
+      a: String(c[4]?.v || "Sin dirección"),
+      g: String(c[5]?.v || ""),
+      x: c[6]?.v ? String(c[6].v) : "",
+      att: parseInt(c[7]?.v) || 0,
+      st: c[8]?.v || "pend",
+      w: String(c[9]?.v || "")
+    };
+  });
+  falloRed = false;
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(L)); } catch (e) {}
+  refrescarEstado();
+  render();
+};
+
+function cargarDatos() {
+  if (!SPREADSHEET_ID) return;
+  if (leerCola().length) {
+    vaciarCola().then(() => { if (!leerCola().length) setTimeout(cargarDatos, 1500); else usarCache(); });
+    return;
+  }
+  const oldScript = document.getElementById("jsonp-sheet");
+  if (oldScript) oldScript.remove();
+  const script = document.createElement("script");
+  script.id = "jsonp-sheet";
+  script.onerror = () => { falloRed = true; usarCache(); refrescarEstado(); };
+  script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=responseHandler:procesarDatosSheets&_=` + Date.now();
+  document.body.appendChild(script);
+}
+
+function setFiltroFecha(tipo, btn) {
+  filtroActual = tipo;
+  document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  if(tipo !== 'rango') {
+    document.getElementById("date-from").value = "";
+    document.getElementById("date-to").value = "";
+  }
+  render();
+}
+
+function accion(id, act) {
+  const p = L.find(x => x.id == id);
+  if (p) {
+    if (act === "intentar") p.att = Math.min(3, p.att + 1);
+    else if (act === "menos" && p.att > 0) p.att--;
+    else if (act === "reiniciar") p.att = 0;
+    else if (act === "entregado") p.st = p.st === "ent" ? "pend" : "ent";
+    else if (act === "sin_contacto") p.st = p.st === "sin" ? "pend" : "sin";
+    else if (act === "corregir") {
+      abrirForm(p.id); return;
+    } else if (act === "eliminar") {
+      if (!confirm("¿Eliminar este paquete?")) return;
+      L = L.filter(x => x.id != id);
+      enviar({action:"deletePackage", id});
+      render(); return;
+    }
+    enviar(paquete(p,"updatePackage"));
+    render();
+  }
+}
+
+function render() {
+  const query = document.getElementById("search").value.toLowerCase();
+  const dateFrom = document.getElementById("date-from").value;
+  const dateTo = document.getElementById("date-to").value;
+  
+  const hoyStr = hoyLocal();
+
+  const filtrados = L.filter(p => {
+    // Búsqueda de texto
+    const matchText = p.n.toLowerCase().includes(query) || 
+                      p.t.toLowerCase().includes(query) || 
+                      p.a.toLowerCase().includes(query) || 
+                      p.g.toLowerCase().includes(query);
+    if (!matchText) return false;
+
+    // Filtros de fecha / calendario
+    if (dateFrom && dateTo) {
+      return p.fecha >= dateFrom && p.fecha <= dateTo;
+    }
+    if (filtroActual === 'hoy') {
+      return p.fecha === hoyStr;
+    }
+    if (filtroActual === 'semana') {
+      // Filtro aproximado últimos 7 días
+      const d = new Date();
+      d.setDate(d.getDate() - 7);
+      return p.fecha >= isoLocal(d);
+    }
+    if (filtroActual === 'mes') {
+      return p.fecha.startsWith(hoyStr.substring(0, 7));
+    }
+    return true;
+  });
+
+  // Actualizar contadores del reporte
+  document.getElementById("rep-total").textContent = L.length;
+  document.getElementById("rep-pend").textContent = L.filter(x => x.st === "pend").length;
+  document.getElementById("rep-ent").textContent = L.filter(x => x.st === "ent").length;
+
+  const container = document.getElementById("list");
+  if (!filtrados.length) {
+    container.innerHTML = '<div style="text-align:center; color:var(--mu); padding:10px;">No hay paquetes en este periodo o filtro.</div>';
+    return;
+  }
+
+  container.innerHTML = filtrados.map(p => {
+    const done = p.st !== "pend", ready = p.att >= 3;
+    const tag = p.st === "ent" ? '<span class="tag ok">Entregado</span>' : p.st === "sin" ? '<span class="tag no">Sin contacto</span>' : "";
+    return '<div class="card' + (done ? " done" : "") + '">' +
+      '<div class="nm"><span>' + E(p.n) + '</span>' + tag + '</div>' +
+      '<div class="ad">' + E(p.a) + '</div>' +
+      '<div class="meta">📅 ' + E(p.fecha) + ' · 📱 ' + E(p.t) + (p.g ? " · " + E(p.g) : "") + '</div>' +
+      (p.w ? '<div class="meta" style="color:var(--wr)">⚠️ ' + E(p.w) + '</div>' : "") +
+      '<div class="at">Llamadas: <b>' + p.att + '/3</b></div>' +
+      '<div class="main-actions">' +
+        '<a class="b-main" href="tel:+' + ph(p.t) + '" onclick="accion(' + p.id + ',\'intentar\')">📞 Llamar</a>' +
+        '<a class="b-main wa" href="' + wa(p, p.t) + '" target="_blank">💬 WhatsApp</a>' +
+      '</div>' +
+      '<div class="sm-row">' +
+        '<button class="sm-btn ok" onclick="accion(' + p.id + ',\'entregado\')">✅ Entregado</button>' +
+        '<button class="sm-btn no" onclick="accion(' + p.id + ',\'sin_contacto\')">🚫 Sin contacto</button>' +
+        '<button class="sm-btn" onclick="accion(' + p.id + ',\'corregir\')">✏️ Editar datos</button>' +
+        '<button class="sm-btn" onclick="accion(' + p.id + ',\'reiniciar\')">🔄 Reiniciar</button>' +
+        '<button class="sm-btn" onclick="accion(' + p.id + ',\'menos\')">-1</button>' +
+        '<button class="sm-btn del" onclick="accion(' + p.id + ',\'eliminar\')">🗑️</button>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+}
+
+function guardarPaquete() {
+  const n = document.getElementById("add-name").value;
+  const t = document.getElementById("add-tel").value;
+  const a = document.getElementById("add-dir").value;
+  const g = document.getElementById("add-gui").value;
+  const b = document.getElementById("add-blur").checked;
+  if(!n) return alert("Ingresa el nombre del cliente");
+  const dup = duplicada(g, null);
+  if (dup && !confirm(avisoDup(dup) + "\n¿Guardar de todos modos?")) return;
+  
+  const nuevo = { id: Date.now(), fecha: hoyLocal(), n, t, a, g, x: "", att: 0, st: "pend", w: b ? "Etiqueta borrosa" : "" };
+  L.push(nuevo);
+  enviar(paquete(nuevo,"addPackage"));
+  
+  document.getElementById("add-name").value = "";
+  document.getElementById("add-tel").value = "";
+  document.getElementById("add-dir").value = "";
+  document.getElementById("add-gui").value = "";
+  document.getElementById("add-blur").checked = false;
+  render();
+}
+
+function configurar(forzar) {
+  if (!forzar && CFG.sheet && CFG.api) return;
+  document.getElementById("c-sheet").value = CFG.sheet || "";
+  document.getElementById("c-api").value = CFG.api || "";
+  document.getElementById("c-gem").value = CFG.gem || "";
+  document.getElementById("c-model").value = CFG.model || "";
+  document.getElementById("dlg-cfg").showModal();
+}
+function enlaceCfg() {
+  if (!CFG.sheet || !CFG.api) return alert("Primero guarda los datos en este dispositivo.");
+  const u = location.href.split("#")[0] + "#c=" + encodeURIComponent(btoa(JSON.stringify({ sheet: CFG.sheet, api: CFG.api, gem: CFG.gem || "", model: CFG.model || "" })));
+  const ok = () => alert("Enlace copiado. Envíatelo a ti mismo y ábrelo en el otro dispositivo. Incluye tu clave de Gemini: no lo compartas con nadie.");
+  if (navigator.clipboard) navigator.clipboard.writeText(u).then(ok).catch(() => prompt("Copia este enlace:", u));
+  else prompt("Copia este enlace:", u);
+}
+function guardarCfg() {
+  const v = i => document.getElementById(i).value.trim();
+  if (!v("c-sheet") || !v("c-api")) return alert("Faltan la hoja y la URL de Apps Script");
+  const id = (v("c-sheet").match(/\/d\/([^\/]+)/) || [null, v("c-sheet")])[1];
+  const cfg = JSON.stringify({ sheet: id, api: v("c-api"), gem: v("c-gem"), model: v("c-model") });
+  try { localStorage.setItem("cfg_entregas", cfg); } catch (e) {}
+  let leido = null;
+  try { leido = localStorage.getItem("cfg_entregas"); } catch (e) {}
+  if (leido !== cfg) return alert("Este navegador NO está guardando los datos de esta página (suele pasar al abrir el archivo desde el explorador de archivos). Aloja la página en una dirección https o ábrela de otra forma.");
+  location.reload();
+}
+
+let editId = null;
+function abrirForm(id, pre) {
+  editId = id;
+  const d = pre || L.find(x => x.id == id) || {};
+  const set = (k, v) => { document.getElementById(k).value = v || ""; };
+  set("f-n", d.n); set("f-t", d.t); set("f-x", d.x); set("f-a", d.a); set("f-g", d.g); set("f-w", d.w);
+  document.getElementById("dlg-t").textContent = id ? "Editar paquete" : "Revisar y guardar paquete";
+  const dup = !id && d.g ? duplicada(d.g, null) : null;
+  document.getElementById("dlg-warn").textContent = (d.w ? "⚠️ " + d.w : "") + (dup ? " ⛔ " + avisoDup(dup) : "");
+  document.getElementById("dlg").showModal();
+}
+function guardarForm() {
+  const v = i => document.getElementById(i).value.trim();
+  if (!v("f-n")) return alert("Falta el nombre");
+  const datos = { n: v("f-n"), t: v("f-t"), x: v("f-x"), a: v("f-a"), g: v("f-g"), w: v("f-w") };
+  const dup = duplicada(datos.g, editId);
+  if (dup && !confirm(avisoDup(dup) + "\n¿Guardar de todos modos?")) return;
+  if (editId) {
+    const p = L.find(x => x.id == editId);
+    Object.assign(p, datos);
+    enviar(paquete(p, "updatePackage"));
+  } else {
+    const nuevo = { id: Date.now(), fecha: hoyLocal(), att: 0, st: "pend", ...datos };
+    L.push(nuevo);
+    enviar(paquete(nuevo, "addPackage"));
+  }
+  document.getElementById("dlg").close();
+  render();
+}
+
+async function escanearOCR(file) {
+  if (!file) return;
+  const st = document.getElementById("ocr-st");
+  if (!window.Tesseract) { st.textContent = "OCR no disponible (¿sin internet?). Escríbelo a mano."; return; }
+  st.textContent = "Leyendo etiqueta… la primera vez descarga el idioma y tarda más.";
+  try {
+    const r = await Tesseract.recognize(file, "spa", {
+      logger: m => { if (m.status === "recognizing text") st.textContent = "Leyendo… " + Math.round(m.progress * 100) + "%"; }
+    });
+    const d = analizar(r.data);
+    st.textContent = "Revisa los datos antes de guardar.";
+    abrirForm(null, d);
+  } catch (e) {
+    st.textContent = "No se pudo leer la foto. Intenta de nuevo o escríbelo a mano.";
+  }
+}
+
+function analizar(data) {
+  const lines = data.text.split("\n").map(s => s.trim()).filter(Boolean);
+  const avisos = [];
+  const g = ((data.text.match(/JPE\s?\d{9,}/i) || [""])[0]).replace(/\s/g, "").toUpperCase();
+  const iN = lines.findIndex(l => /nombre/i.test(l));
+  const n = iN >= 0 ? lines[iN].replace(/.*nombre\s*:?/i, "").trim() : "";
+  const iT = lines.findIndex((l, i) => i >= Math.max(iN, 0) && /tel/i.test(l));
+  let t = "", conf = 0;
+  if (iT >= 0) {
+    const rest = lines[iT].split(/tel\s*:?/i)[1] || "";
+    const m = rest.replace(/\D/g, "").match(/9\d{8}/);
+    if (m) {
+      t = m[0];
+      const ws = (data.words || []).filter(w => { const dg = w.text.replace(/\D/g, ""); return dg.length >= 5 && t.includes(dg.slice(-5)); });
+      conf = ws.length ? Math.min(...ws.map(w => w.confidence)) : 0;
+    }
+  }
+  const iE = lines.findIndex((l, i) => i > iT && /\w+\s*\/\s*\w+\s*\/\s*\w+/.test(l));
+  let a = iT >= 0 ? lines.slice(iT + 1, iE > iT ? iE : iT + 3).join(" ") : "";
+  if (data.confidence < 60 || (a.match(/[A-Za-zÁÉÍÓÚÑáéíóúñ0-9 ]/g) || []).length < a.length * 0.8) a = "";
+  if (!t) avisos.push("No se leyó el teléfono: escríbelo");
+  else if (conf < 85) avisos.push("Teléfono poco legible (" + Math.round(conf) + "%): confírmalo antes de llamar");
+  if (!n) avisos.push("No se leyó el nombre");
+  if (!a) avisos.push("No se leyó la dirección");
+  if (data.confidence < 70) avisos.push("Foto de baja calidad: revisa todo");
+  return { n, t, a, g, x: "", w: avisos.join(" · ") };
+}
+
+async function reducir(file, max = 1600) {
+  let bmp;
+  try { bmp = await createImageBitmap(file, { imageOrientation: "from-image" }); }
+  catch (e) { bmp = await createImageBitmap(file); }
+  const k = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(bmp.width * k);
+  c.height = Math.round(bmp.height * k);
+  c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", 0.85).split(",")[1];
+}
+
+const PROMPT_IA = `Eres un lector de etiquetas de envío J&T Express (Perú). Lee SOLO los datos impresos del DESTINATARIO: el primer bloque "Nombre / C.P. / Tel" y la dirección que está justo debajo.
+IGNORA: el bloque del remitente (Nombre CAN... / Tel 123456789 / Av. Elmer Faucett), las firmas y todo lo escrito a mano con lapicero.
+La foto puede ser de una pantalla, estar arrugada o con brillo.
+NO ADIVINES: si un dato o dígito no se lee con certeza, deja el campo vacío o marca el dígito dudoso con "?" y descríbelo en "dudas".
+En "direccion" no incluyas el teléfono ni frases como "llamar al ...".
+Responde SOLO este JSON: {"nombre":"","telefono":"9 dígitos","direccion":"","guia":"JPE y números","dudas":["..."]}`;
+
+async function leerConIA(file) {
+  const b64 = await reducir(file);
+  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + (CFG.model || "gemini-2.5-flash") + ":generateContent", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": CFG.gem },
+    body: JSON.stringify({
+      contents: [{ parts: [{ inline_data: { mime_type: "image/jpeg", data: b64 } }, { text: PROMPT_IA }] }],
+      generationConfig: { responseMimeType: "application/json", temperature: 0 }
+    })
+  });
+  if (!res.ok) throw new Error("error " + res.status);
+  const j = await res.json();
+  const txt = (j.candidates?.[0]?.content?.parts || []).map(p => p.text || "").join("");
+  const d = JSON.parse(txt.replace(/```json|```/g, "").trim());
+  const avisos = Array.isArray(d.dudas) ? d.dudas.map(String) : [];
+  let t = String(d.telefono || "").trim();
+  const dg = t.replace(/\D/g, "");
+  if (!t.includes("?")) t = dg.length === 11 && dg.startsWith("51") ? dg.slice(2) : dg;
+  const dg2 = t.replace(/\D/g, "");
+  if (t.includes("?") || dg2.length !== 9 || dg2[0] !== "9") avisos.push("Teléfono dudoso: confírmalo antes de llamar");
+  if (!d.nombre) avisos.push("No se leyó el nombre");
+  if (!d.direccion) avisos.push("No se leyó la dirección");
+  return { n: String(d.nombre || ""), t, a: String(d.direccion || ""), g: String(d.guia || "").replace(/\s/g, "").toUpperCase(), x: "", w: avisos.join(" · ") };
+}
+
+async function escanear(file) {
+  if (!file) return;
+  const st = document.getElementById("ocr-st");
+  if (!CFG.gem) { st.textContent = "Falta la clave de Gemini: pégala en ⚙️."; configurar(true); return; }
+  st.textContent = "Leyendo con IA…";
+  try {
+    const d = await leerConIA(file);
+    st.textContent = "Revisa los datos antes de guardar.";
+    abrirForm(null, d);
+  } catch (e) {
+    st.textContent = "La IA falló (" + e.message + "). Probando OCR básico…";
+    escanearOCR(file);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  configurar(false);
+  document.getElementById("ocr-st").textContent = CFG.gem ? "IA lista ✓" : "Falta la clave de Gemini: pégala en ⚙️.";
+  refrescarEstado();
+  cargarDatos();
+  setInterval(() => { if (leerCola().length) vaciarCola(); else if (falloRed) cargarDatos(); }, 20000);
+});
+</script>
+</body>
+</html>
